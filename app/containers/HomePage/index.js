@@ -17,7 +17,7 @@ import { addTodo } from './actions';
 import { v4 as uuidv4 } from 'uuid';
 import { makeStyles } from '@material-ui/styles';
 import Todo from './todo';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 const useStyles = makeStyles({
   container: { display: 'grid', placeItems: 'center' },
@@ -26,7 +26,6 @@ const useStyles = makeStyles({
 
 function HomePage(props) {
   const [input, setInput] = useState('');
-  const [todos, setTodos] = useState(props.list);
 
   useInjectReducer({ key: 'todo', reducer });
 
@@ -41,12 +40,10 @@ function HomePage(props) {
 
   function handleOnDragEnd(result) {
     if (!result.destination) return;
-
-    const items = Array.from(todos);
+    const items = Array.from(props.list);
     const [reorderedTodos] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedTodos);
-
-    setTodos(items);
+    console.log(result);
   }
 
   const classes = useStyles();
@@ -58,6 +55,7 @@ function HomePage(props) {
         <TextField value={input} onChange={e => setInput(e.target.value)} />
         <Button onClick={() => handleTodo(input)}>add todo</Button>
       </div>
+
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="todos">
           {provided => (
@@ -66,17 +64,8 @@ function HomePage(props) {
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              {todos.map((todo, index) => (
-                <Draggable key={uuidv4()} draggableId={todo.id} index={index}>
-                  {provided => (
-                    <Todo
-                      todo={todo}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      ref={provided.innerRef}
-                    />
-                  )}
-                </Draggable>
+              {props.list.map((todo, index) => (
+                <Todo todo={todo} index={index} key={index} />
               ))}
               {provided.placeholder}
             </div>
