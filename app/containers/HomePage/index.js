@@ -26,6 +26,7 @@ const useStyles = makeStyles({
 
 function HomePage(props) {
   const [input, setInput] = useState('');
+  const todos = props.list;
 
   useInjectReducer({ key: 'todo', reducer });
 
@@ -40,10 +41,11 @@ function HomePage(props) {
 
   function handleOnDragEnd(result) {
     if (!result.destination) return;
-    const items = Array.from(props.list);
-    const [reorderedTodos] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedTodos);
-    console.log(result);
+    const srcIndex = result.source.index;
+    const desIndex = result.destination.index;
+    const srctodo = todos[srcIndex];
+    todos[srcIndex] = todos[desIndex];
+    todos[desIndex] = srctodo;
   }
 
   const classes = useStyles();
